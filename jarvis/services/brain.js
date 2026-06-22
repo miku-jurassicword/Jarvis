@@ -1,36 +1,14 @@
-import { detectarIntencao } from "./intent";
-import { executarSkill } from "./skills";
-import { pegar, adicionarHistorico } from "./memory";
+import { runSkills } from "./skills";
+import { perguntarIA } from "./ia";
+import { saveMemory } from "./memory";
 
-export async function brain(input, iaResposta) {
-  const intent = detectarIntencao(input);
+export async function brain(text) {
+  const skill = runSkills(text);
+  if (skill) return skill;
 
-  // 🧠 salva histórico
-  const historico = await adicionarHistorico({
-    role: "user",
-    text: input,
-  });
+  // guarda histórico simples
+  await saveMemory("last_input", text);
 
-  // 🔌 tenta skill
-  const skill = await executarSkill(intent, input);
-  if (skill) {
-    await adicionarHistorico({ role: "ai", text: skill });
-    return skill;
-  }
-
-  // 🧠 pega memória de contexto
-  const contexto = historico
-    .slice(-5)
-    .map((m) => `${m.role}: ${m.text}`)
-    .join("\n");
-
-  // 🤖 IA recebe contexto (IMPORTANTE)
-  const respostaFinal = `${iaResposta}`;
-
-  await adicionarHistorico({ role: "ai", text: respostaFinal });
-
-  return respostaFinal;
-}
-export function ativadoPorWakeWord(texto) {
-  return texto.toLowerCase().startsWith("jarvis");
+  const ia = await perguntarIA(text);
+  return ia;
 }

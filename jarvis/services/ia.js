@@ -1,22 +1,41 @@
-import axios from "axios";
-
-const API_KEY = "AQ.Ab8RN6JcyRt6MZh5-DeF1pyFihXg7bcArrsCc3MG7htQMoLXNA";
+const API_KEY = "AQ.Ab8RN6LsVQ8UCG0eF-jpe6OnenyvSpZoT4wE-1PrHDpp3t7QAQ";
 
 export async function perguntarIA(texto) {
   try {
-    const res = await axios.post(
+    const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
       {
-        contents: [
-          {
-            parts: [{ text: texto }],
-          },
-        ],
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Você é um assistente tipo JARVIS. Responda curto e direto:\n${texto}`,
+                },
+              ],
+            },
+          ],
+        }),
       }
     );
 
-    return res.data.candidates?.[0]?.content?.parts?.[0]?.text;
-  } catch (err) {
-    return "Erro na IA 🤖";
+    const data = await res.json();
+
+    console.log("🔥 GEMINI RAW:", JSON.stringify(data, null, 2));
+
+    if (data?.error) {
+      return `ERRO: ${data.error.message}`;
+    }
+
+    return (
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Sem resposta da IA ⚠️"
+    );
+  } catch (e) {
+    return "Erro de conexão ⚠️";
   }
 }

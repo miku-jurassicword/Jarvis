@@ -1,22 +1,26 @@
 import * as Linking from "expo-linking";
 
-const skills = {
-  youtube: () => {
+export function runSkills(text) {
+  const msg = text.toLowerCase();
+
+  if (msg.includes("abrir youtube")) {
     Linking.openURL("https://youtube.com");
-    return "YouTube aberto.";
-  },
+    return "Abrindo YouTube ⚡";
+  }
 
-  google: () => {
-    Linking.openURL("https://google.com");
-    return "Google aberto.";
-  },
-};
+  if (msg.includes("abrir whatsapp")) {
+    Linking.openURL("whatsapp://send");
+    return "Abrindo WhatsApp 📲";
+  }
 
-export function executarSkill(intent, texto) {
-  const t = texto.toLowerCase();
+  if (msg.includes("abrir instagram")) {
+    Linking.openURL("instagram://");
+    return "Abrindo Instagram 📸";
+  }
 
-  if (t.includes("youtube")) return skills.youtube();
-  if (t.includes("google")) return skills.google();
+  if (msg.includes("quem é você")) {
+    return "Sou o JARVIS, seu sistema inteligente.";
+  }
 
   return null;
 }
